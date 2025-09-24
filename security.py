@@ -27,14 +27,15 @@ def setup_security_headers(app):
         # FIXED Content Security Policy - includes all required domains
         csp = (
             "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' " # Added 'unsafe-eval' for TensorFlow.js
             "https://cdnjs.cloudflare.com "
             "https://cdn.tailwindcss.com "
             "https://cdn.jsdelivr.net "
             "https://code.jquery.com "
             "https://cdn.datatables.net "
             "https://accounts.google.com "
-            "https://apis.google.com; "
+            "https://apis.google.com "
+            "https://unpkg.com; " # Added for html5-qrcode library
             "style-src 'self' 'unsafe-inline' "
             "https://fonts.googleapis.com "
             "https://cdnjs.cloudflare.com "
@@ -49,12 +50,14 @@ def setup_security_headers(app):
             "https://api.github.com "
             "https://accounts.google.com "
             "https://www.googleapis.com "
-            "https://luminous-repo.onrender.com; "
+            "https://luminous-repo.onrender.com "
+            "https://cdn.jsdelivr.net; " # Added for TensorFlow.js source maps
             "frame-src 'self' https://accounts.google.com; "
             "form-action 'self'; "
             "base-uri 'self';"
         )
         response.headers['Content-Security-Policy'] = csp
+
         
         # HSTS (only for HTTPS)
         if request.is_secure:
