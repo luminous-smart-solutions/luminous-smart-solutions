@@ -6,11 +6,11 @@ window.QRScanner = {
         // This function can be expanded if more setup is required.
     },
 
-    // Open QR scanner modal
     openQrScanner(targetInputId) {
         const qrModal = document.getElementById('qr-scanner-modal');
         if (!qrModal) return;
 
+        // Lazy initialize the scanner object if it doesn't exist
         if (!window.RelayConfig.html5QrCode) {
             window.RelayConfig.html5QrCode = new Html5Qrcode("qr-reader");
         }
@@ -20,7 +20,6 @@ window.QRScanner = {
         const onQrSuccess = (decodedText, decodedResult) => {
             window.RelayConfig.html5QrCode.stop().then(() => {
                 window.DOMHelpers.toggleElementVisibility('qr-scanner-modal', false);
-                // MODIFICATION: Directly populate the input field with the scanned board ID
                 const targetInput = document.getElementById(targetInputId);
                 if(targetInput) {
                     targetInput.value = decodedText;
@@ -32,21 +31,13 @@ window.QRScanner = {
         window.RelayConfig.html5QrCode.start({ facingMode: "environment" }, config, onQrSuccess);
     },
 
+    // Close QR scanner modal
     closeQrScanner() {
         if (window.RelayConfig.html5QrCode) {
             window.RelayConfig.html5QrCode.stop().catch(err => {});
         }
         window.DOMHelpers.toggleElementVisibility('qr-scanner-modal', false);
     }
-
-    // Close QR scanner modal
-    closeQrScanner() {
-        if (window.RelayConfig.html5QrCode) {
-            window.RelayConfig.html5QrCode.stop().catch(err => {});
-        }
-        const qrModal = document.getElementById('qr-scanner-modal');
-        if(qrModal) qrModal.classList.add('hidden');
-    },
 
     // Handle QR code data by sending it to the backend for decryption
     async handleQrCodeData(encryptedText, roomId) {
