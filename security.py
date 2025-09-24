@@ -155,7 +155,13 @@ def rate_limit(max_requests=60, window=60):
             # Check rate limit
             if len(request_counts[client_ip]) >= max_requests:
                 current_app.logger.warning(f"Rate limit exceeded for {client_ip}")
-                return "Rate limit exceeded", 429
+                
+                if request.is_json or request.path.startswith('/api/'):
+                    return jsonify({'error': 'Rate limit exceeded. Please try again later.'}), 429
+                else:
+                    flash('Too many attempts. Please try again in a few moments.', 'error')
+                    # Redirect the user back to the page they were trying to access
+                    return redirect(request.url)
             
             # Record this request
             request_counts[client_ip].append(now)
